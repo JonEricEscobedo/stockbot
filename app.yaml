@@ -7,3 +7,18 @@ handlers:
   static_dir: static
 - url: /.*
   script: main.app
+
+skip_files:
+# default
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+# end of default
+- ^app/node_modules$
+- ^(.*/)?\.vue$
+- ^(.*/)?\LICENSE$
+- ^(.*/)?\package.json$
+- ^(.*/)?\README.md$
+- ^(.*/)?\webpack.config.js$

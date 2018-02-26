@@ -1,7 +1,7 @@
 <template>
   <div>
     <Navbar />
-    <Splash />
+    <Splash :stock-data="stockData"></Splash>
     <About />
   </div>
 </template>
@@ -14,32 +14,29 @@ import About from './About.vue'
 
 export default {
   components: { Navbar, Splash, About },
-  props: {
-    stockData: Object
+  data () {
+    return {
+      stockData: null
+    }
+  },
+  methods: {
+    getStockData () {
+      this.stockData = this.getStockDataFromBackend()
+    },
+    getStockDataFromBackend () {
+      const path = `http://localhost:8080/api/data/stock`
+      axios.get(path)
+        .then(response => {
+          this.stockData = response.data.stock
+        })
+        .catch(error => {
+          console.log('Error fetching', error)
+        })
+    }
+  },
+  created () {
+    this.getStockData()
   }
-  // data () {
-  //   return {
-  //     stockQuote: 0
-  //   }
-  // },
-  // methods: {
-  //   getRandom () {
-  //     this.stockQuote = this.getRandomFromBackend()
-  //   },
-  //   getRandomFromBackend () {
-  //     const path = `http://localhost:8080/api/data/stock`
-  //     axios.get(path)
-  //       .then(response => {
-  //         this.stockQuote = response.data.stockQuote
-  //       })
-  //       .catch(error => {
-  //         console.log('Error fetching', error)
-  //       })
-  //   }
-  // },
-  // created () {
-  //   this.getRandom()
-  // }
 }
 </script>
 

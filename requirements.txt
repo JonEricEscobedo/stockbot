@@ -1,6 +1,8 @@
+click==6.7
 Flask==0.12.2
-Werkzeug<0.13.0,>=0.12.0
-Requests==2.18.4
+Flask-Cors==3.0.3
+itsdangerous==0.24
 Jinja2==2.10
-logging==0.4.9.6
-requests-toolbelt==0.8.0
+MarkupSafe==1.0
+six==1.11.0
+Werkzeug==0.14.1

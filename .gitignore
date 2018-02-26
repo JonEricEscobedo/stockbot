@@ -1,0 +1,11 @@
+# System
+.DS_Store
+
+# JavaScript - Vue
+app/node_modules/
+app/dist
+
+# Python - Flask
+lib/
+env/
+*.pyc

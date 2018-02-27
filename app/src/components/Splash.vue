@@ -23,7 +23,7 @@
 export default {
   props: ['stock-data'],
   created () {
-    console.log('yo', this.stockData)
+    // console.log('yo', this.stockData)
   }
 }
 </script>

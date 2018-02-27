@@ -24,7 +24,7 @@ export default {
       this.stockData = this.getStockDataFromBackend()
     },
     getStockDataFromBackend () {
-      const path = `http://localhost:8080/api/data/stock`
+      const path = `${process.env.API_URL}/api/data/stock`
       axios.get(path)
         .then(response => {
           this.stockData = response.data.stock

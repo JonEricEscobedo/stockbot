@@ -24,4 +24,4 @@ dev_appserver.py .
 
 ## Notes
 `main.py` code credit for Google App Engine and Flask + Vue compatability goes to: https://github.com/Valmoz/gae-vue-flask-starter. 
-This repo was increadibly helpful getting Flask + Vue ready for GAE deployment.
+This repo was incredibly helpful getting Flask + Vue ready for GAE deployment.

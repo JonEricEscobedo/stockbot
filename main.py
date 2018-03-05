@@ -8,7 +8,7 @@ import requests_toolbelt.adapters.appengine
 from random import *
 # /tutorial
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
@@ -22,8 +22,11 @@ app.jinja_loader = jinja2.FileSystemLoader('app/dist')
 # API Route `/api/data/stock` - Fetches stock quote and logo
 @app.route('/api/data/stock')
 def fetch_quote():
-    raw_stock_quote_response = requests.get('https://api.iextrading.com/1.0/stock/nvda/batch?types=quote').json()
-    raw_stock_logo_response = requests.get('https://api.iextrading.com/1.0/stock/nvda/logo').json()
+    ticker = request.args.get('ticker')
+    custom_quote_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/batch?types=quote'.format(STOCK=ticker)
+    custom_logo_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/logo'.format(STOCK=ticker)
+    raw_stock_quote_response = requests.get(custom_quote_url).json()
+    raw_stock_logo_response = requests.get(custom_logo_url).json()
     stock_quote_high = raw_stock_quote_response['quote']['high']
     stock_quote_low = raw_stock_quote_response['quote']['low']
     stock_quote_avg = str(round((stock_quote_high + stock_quote_low) / 2, 2))

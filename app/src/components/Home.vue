@@ -25,7 +25,12 @@ export default {
     },
     getStockDataFromBackend () {
       const path = `${process.env.API_URL}/api/data/stock`
-      axios.get(path)
+      const ticker = 'nvda'
+      axios.get(path, {
+        params: {
+          ticker: ticker
+        }
+      })
         .then(response => {
           this.stockData = response.data.stock
         })

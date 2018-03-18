@@ -1,7 +1,7 @@
 <template>
   <div>
     <Navbar />
-    <Splash :stock-data="stockData"></Splash>
+    <Splash :stock-data="stockData" :prediction-data="predictionData"></Splash>
     <About />
   </div>
 </template>
@@ -16,7 +16,8 @@ export default {
   components: { Navbar, Splash, About },
   data () {
     return {
-      stockData: null
+      stockData: null,
+      predictionData: null
     }
   },
   methods: {
@@ -25,7 +26,7 @@ export default {
     },
     getStockDataFromBackend () {
       const path = `${process.env.API_URL}/api/data/stock`
-      const ticker = 'nvda'
+      const ticker = 'tsla'
       axios.get(path, {
         params: {
           ticker: ticker
@@ -33,6 +34,7 @@ export default {
       })
         .then(response => {
           this.stockData = response.data.stock
+          this.predictionData = response.data.prediction
         })
         .catch(error => {
           console.log('Error fetching', error)

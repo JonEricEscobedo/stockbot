@@ -1,28 +1,24 @@
 <template>
-  <div>
-    <section>
-      <div class="container flex-center">
-        <div class="row flex-center pt-5 mt-5">
-          <div class="offset-md-1 col-md-4 text-center text-md-left align-self-center">
-            <div v-if="stockData">
-              <img class="rounded" v-bind:src="stockData.logo" />
-              <h1 class="display-1">{{ stockData.ticker }}</h1>
-              <p class="lead">{{ stockData.company }}</p>
-              <p class="lead">Today's average: ${{ stockData.quote }}</p>
-              <p class="lead">Tomorrow's predicted average: ${{ predictionData.tomorrow }}</p>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <img src="../assets/phone-transparent-mockup.png" alt="iphone 7" class="img-fluid">
-          </div>
+  <section>
+    <div class="container flex-center">
+      <div class="row flex-center pt-5 mt-5">
+        <div class="offset-md-1 col-md-4 text-center text-md-left align-self-center">
+          <Stock :stock-data="stockData" :prediction-data="predictionData"></Stock>
+        </div>
+        <div class="col-md-6">
+          <SplashImage />
         </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 </template>
 
 <script>
+import Stock from './Stock.vue'
+import SplashImage from './SplashImage.vue'
+
 export default {
+  components: { Stock, SplashImage },
   props: ['stock-data', 'prediction-data']
 }
 </script>

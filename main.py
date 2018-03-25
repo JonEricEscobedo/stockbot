@@ -56,7 +56,7 @@ def fetch_quote():
     quote_yesterday_avg = str(calculate_average(quote_yesterday_high, quote_yesterday_low))
 
     # Prediction algorithm #1
-    quote_prediction = predict_stock_algorithm_1(float(quote_avg), float(quote_yesterday_avg))
+    quote_prediction = str(predict_stock_algorithm_1(float(quote_avg), float(quote_yesterday_avg)))
 
     response = {
         'stock': {

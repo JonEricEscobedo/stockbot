@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Navbar />
+    <Navbar @update-stock-ticker="updateStockTicker" :on-quote-click="getStockDataFromBackend" />
     <Splash :stock-data="stockData" :prediction-data="predictionData" />
     <About />
   </div>
@@ -17,16 +17,17 @@ export default {
   data () {
     return {
       stockData: null,
-      predictionData: null
+      predictionData: null,
+      ticker: ''
     }
   },
   methods: {
     getStockDataFromBackend () {
       const path = `${process.env.API_URL}/api/data/stock`
-      const ticker = 'tsla'
+
       axios.get(path, {
         params: {
-          ticker: ticker
+          ticker: this.ticker
         }
       })
         .then(response => {
@@ -34,11 +35,16 @@ export default {
           this.predictionData = response.data.prediction
         })
         .catch(error => {
-          console.log('Error fetching', error)
+          console.log('Error fetching stock data', error)
         })
+    },
+    updateStockTicker (newData) {
+      // Update this.ticker to reflect user inputted stock ticker
+      this.ticker = newData
     }
   },
   created () {
+    this.ticker = 'tsla' // Load TSLA stock data on component creation
     this.getStockDataFromBackend()
   }
 }

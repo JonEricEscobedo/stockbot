@@ -34,12 +34,8 @@
 </template>
 
 <script>
-import moment from 'moment'
 
 export default {
-  props: ['stock-data', 'prediction-data'],
-  created () {
-    console.log(this.stockData.date, moment(this.stockData.date).valueOf())
-  }
+  props: ['stock-data', 'prediction-data']
 }
 </script>

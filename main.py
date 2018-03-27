@@ -4,9 +4,7 @@ import os
 import urllib2
 import requests
 import requests_toolbelt.adapters.appengine
-# tutorial
-from random import *
-# /tutorial
+import datetime
 
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
@@ -33,6 +31,13 @@ def predict_stock_algorithm_1(p, p_1):
 def calculate_average(high, low):
     return round(((high + low) / 2), 2)
 
+def calculate_date(quote_date, chart_date):
+    quote_date_human_readable = str(datetime.datetime.fromtimestamp(quote_date / 1000).strftime('%Y-%m-%d'))
+    if (quote_date_human_readable == chart_date):
+        return True
+    else:
+        return False
+
 # API Route `/api/data/stock` - Fetches stock quote and logo
 @app.route('/api/data/stock')
 def fetch_quote():
@@ -50,9 +55,18 @@ def fetch_quote():
     quote_low = raw_quote_response['quote']['low']
     quote_avg = str(calculate_average(quote_high, quote_low))
 
+    # Is it a weekend and the markets are closed?
+    is_weekend = calculate_date(raw_quote_response['quote']['closeTime'], raw_quote_response['chart'][-1]['date'])
+    print('is weekend?', is_weekend)
+
     # Calculate yesterday's stock quote average
-    quote_yesterday_high = (raw_quote_response['chart'])[-1]['high']
-    quote_yesterday_low = (raw_quote_response['chart'])[-1]['low']
+    if (is_weekend):
+        quote_yesterday_high = (raw_quote_response['chart'])[-2]['high']
+        quote_yesterday_low = (raw_quote_response['chart'])[-2]['low']
+    else:
+        quote_yesterday_high = (raw_quote_response['chart'])[-1]['high']
+        quote_yesterday_low = (raw_quote_response['chart'])[-1]['low']
+
     quote_yesterday_avg = str(calculate_average(quote_yesterday_high, quote_yesterday_low))
 
     # Prediction algorithm #1

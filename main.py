@@ -57,7 +57,7 @@ def fetch_quote():
 
     # Is it a weekend and the markets are closed?
     is_weekend = calculate_date(raw_quote_response['quote']['closeTime'], raw_quote_response['chart'][-1]['date'])
-    print('is weekend?', is_weekend)
+    print('is weekend detected?', is_weekend)
 
     # Calculate yesterday's stock quote average
     if (is_weekend):

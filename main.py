@@ -17,7 +17,7 @@ app = Flask(__name__)
 cors = CORS(app, resources={r'/api/*': {'origins': '*'}})
 app.jinja_loader = jinja2.FileSystemLoader('app/dist')
 
-# Utility functions
+# Prediction algorithms
 def predict_stock_algorithm_1(p, p_1):
     # Step 1
     # delta = (p - p-1) / (t - t-1) where (t-t-1) will equal 1
@@ -28,6 +28,7 @@ def predict_stock_algorithm_1(p, p_1):
     p_predict = ((delta)*1) + p
     return p_predict
 
+# Utility functions
 def calculate_average(high, low):
     return round(((high + low) / 2), 2)
 
@@ -38,12 +39,34 @@ def calculate_date(quote_date, chart_date):
     else:
         return False
 
+def calculate_error(today, yesterday):
+    today_avg = calculate_average(today['high'], today['low'])
+    yesterday_avg = calculate_average(yesterday['high'], yesterday['low'])
+
+    # error = predicted value - actual value
+    return round((predict_stock_algorithm_1(today_avg, yesterday_avg) - today_avg), 2)
+
+def fetch_quote_extended(symbol):
+    ticker = symbol
+    quote_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/batch?types=chart&range=6m'.format(STOCK=ticker)
+
+    raw_quote_response = requests.get(quote_url).json()
+    chart_quotes = raw_quote_response['chart']
+    chart_length = len(chart_quotes) - 1
+
+    error_data_points = []
+
+    for i in range(chart_length, chart_length - 100, -1):
+        error_data_points.append(calculate_error(chart_quotes[i], chart_quotes[i - 1])) # TODO: What about the current daily quote??? Charts doesn't get updated until the end...
+
+    return error_data_points
+
 # API Route `/api/data/stock` - Fetches stock quote and logo
 @app.route('/api/data/stock')
 def fetch_quote():
     # Get ticker symbol from FE
     ticker = request.args.get('ticker')
-    quote_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/batch?types=quote,chart&range=1m'.format(STOCK=ticker)
+    quote_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/batch?types=quote,chart&range=6m'.format(STOCK=ticker)
     logo_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/logo'.format(STOCK=ticker)
 
     # Fetch stock quote
@@ -57,7 +80,7 @@ def fetch_quote():
 
     # Is it a weekend and the markets are closed?
     is_weekend = calculate_date(raw_quote_response['quote']['closeTime'], raw_quote_response['chart'][-1]['date'])
-    print('is weekend detected?', is_weekend)
+    print('Market Closed? (Weekend detected?)', is_weekend)
 
     # Calculate yesterday's stock quote average
     if (is_weekend):
@@ -71,6 +94,9 @@ def fetch_quote():
 
     # Prediction algorithm #1
     quote_prediction = str(predict_stock_algorithm_1(float(quote_avg), float(quote_yesterday_avg)))
+
+    # Calculate error for 100 data points
+    error_data_points = fetch_quote_extended(ticker)
 
     response = {
         'stock': {

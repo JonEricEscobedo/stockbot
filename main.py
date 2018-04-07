@@ -29,8 +29,8 @@ def predict_stock_algorithm_1(p, p_1):
     return p_predict
 
 # Utility functions
-def calculate_average(high, low):
-    return round(((high + low) / 2), 2)
+def calculate_average(full_quote):
+    return round(((full_quote['high'] + full_quote['low']) / 2), 2)
 
 def calculate_date(quote_date, chart_date):
     quote_date_human_readable = str(datetime.datetime.fromtimestamp(quote_date / 1000).strftime('%Y-%m-%d'))
@@ -40,26 +40,21 @@ def calculate_date(quote_date, chart_date):
         return False
 
 def calculate_error(today, yesterday):
-    today_avg = calculate_average(today['high'], today['low'])
-    yesterday_avg = calculate_average(yesterday['high'], yesterday['low'])
+    today_avg = calculate_average(today)
+    yesterday_avg = calculate_average(yesterday)
 
     # error = predicted value - actual value
     return round((predict_stock_algorithm_1(today_avg, yesterday_avg) - today_avg), 2)
 
-def fetch_quote_extended(symbol):
-    ticker = symbol
-    quote_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/batch?types=chart&range=6m'.format(STOCK=ticker)
+def fetch_error_points(chart_data):
+    chart_length = len(chart_data) - 1
 
-    raw_quote_response = requests.get(quote_url).json()
-    chart_quotes = raw_quote_response['chart']
-    chart_length = len(chart_quotes) - 1
+    error_points = []
 
-    error_data_points = []
+    for i in range(chart_length - 1, chart_length - 100, -1):
+        error_points.append(calculate_error(chart_data[i], chart_data[i - 1]))
 
-    for i in range(chart_length, chart_length - 100, -1):
-        error_data_points.append(calculate_error(chart_quotes[i], chart_quotes[i - 1])) # TODO: What about the current daily quote??? Charts doesn't get updated until the end...
-
-    return error_data_points
+    return error_points
 
 # API Route `/api/data/stock` - Fetches stock quote and logo
 @app.route('/api/data/stock')
@@ -69,14 +64,12 @@ def fetch_quote():
     quote_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/batch?types=quote,chart&range=6m'.format(STOCK=ticker)
     logo_url = 'https://api.iextrading.com/1.0/stock/{STOCK}/logo'.format(STOCK=ticker)
 
-    # Fetch stock quote
+    # Fetch raw full stock quote & logo
     raw_quote_response = requests.get(quote_url).json()
     raw_logo_response = requests.get(logo_url).json()
 
     # Calculate today's stock quote average
-    quote_high = raw_quote_response['quote']['high']
-    quote_low = raw_quote_response['quote']['low']
-    quote_avg = str(calculate_average(quote_high, quote_low))
+    quote_avg = calculate_average(raw_quote_response['quote'])
 
     # Is it a weekend and the markets are closed?
     is_weekend = calculate_date(raw_quote_response['quote']['closeTime'], raw_quote_response['chart'][-1]['date'])
@@ -84,30 +77,27 @@ def fetch_quote():
 
     # Calculate yesterday's stock quote average
     if (is_weekend):
-        quote_yesterday_high = (raw_quote_response['chart'])[-2]['high']
-        quote_yesterday_low = (raw_quote_response['chart'])[-2]['low']
+        quote_yesterday_avg = calculate_average(raw_quote_response['chart'][-2])
     else:
-        quote_yesterday_high = (raw_quote_response['chart'])[-1]['high']
-        quote_yesterday_low = (raw_quote_response['chart'])[-1]['low']
-
-    quote_yesterday_avg = str(calculate_average(quote_yesterday_high, quote_yesterday_low))
+        quote_yesterday_avg = calculate_average(raw_quote_response['chart'][-1])
 
     # Prediction algorithm #1
-    quote_prediction = str(predict_stock_algorithm_1(float(quote_avg), float(quote_yesterday_avg)))
+    quote_prediction = predict_stock_algorithm_1(quote_avg, quote_yesterday_avg)
 
     # Calculate error for 100 data points
-    error_data_points = fetch_quote_extended(ticker)
+    stock_error_points = fetch_error_points(raw_quote_response['chart'])
+    stock_error_points.insert(0, round((quote_prediction - quote_avg), 2)) # Prepend the latest daily values
 
     response = {
         'stock': {
             'logo': raw_logo_response['url'],
             'ticker': raw_quote_response['quote']['symbol'],
             'company': raw_quote_response['quote']['companyName'],
-            'quote': quote_avg,
+            'quote': str(quote_avg),
             'date': raw_quote_response['quote']['latestTime']
         },
         'prediction': {
-            'tomorrow_avg': quote_prediction
+            'tomorrow_avg': str(quote_prediction)
         }
     }
 

@@ -5,6 +5,7 @@ import urllib2
 import requests
 import requests_toolbelt.adapters.appengine
 import datetime
+import numpy as np
 
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
@@ -28,12 +29,55 @@ def predict_stock_algorithm_1(p, p_1):
     p_predict = ((delta)*1) + p
     return p_predict
 
+# Statistics functions
+def get_lower_and_upper_limit(error_Series):
+    dZ = 1.96
+
+    #Calculate Mean
+    mean = np.mean(error_Series)
+
+    #Calculate Stvd
+    std_dev = np.std(error_Series)
+
+    #Calculate Upper Limit
+    upper_limit = mean + std_dev * dZ
+
+    #Calculate Lower Limit
+    lower_limit = mean - std_dev * dZ
+
+    #Return u,l
+    return (lower_limit, upper_limit)
+
+success_vote = 0.0
+failure_vote = 0.0
+def algo_success(lower_limit, upper_limit, error_t):
+    global success_vote
+    global failure_vote
+    #see if error t is within upper limit and lower limit
+    if error_t >= lower_limit and error_t <= upper_limit:
+        #increment success vote
+        success_vote = success_vote + 1.0
+    else:
+        #increment failure vote
+        failure_vote = failure_vote + 1.0
+    #prob of success vote (success/ (Success+failure))
+    total = success_vote + failure_vote
+
+    probability = float(success_vote) / float(total)
+
+    return (probability)
+
 # Utility functions
 def calculate_average(full_quote):
     return round(((full_quote['high'] + full_quote['low']) / 2), 2)
 
 def calculate_date(quote_date, chart_date):
     quote_date_human_readable = str(datetime.datetime.fromtimestamp(quote_date / 1000).strftime('%Y-%m-%d'))
+
+    ###
+    ### TODO: Double check this! Might be creating false positives when the market closes for the day.
+    ###
+
     if (quote_date_human_readable == chart_date):
         return True
     else:
@@ -46,6 +90,14 @@ def calculate_error(today, yesterday):
     # error = predicted value - actual value
     return round((predict_stock_algorithm_1(today_avg, yesterday_avg) - today_avg), 2)
 
+def determine_analysis(lower, upper, actual):
+    if (lower > actual):
+        return 'of going up'
+    elif (upper < actual):
+        return 'of going down'
+    else:
+        return 'no major change'
+
 def fetch_error_points(chart_data):
     chart_length = len(chart_data) - 1
 
@@ -55,6 +107,7 @@ def fetch_error_points(chart_data):
         error_points.append(calculate_error(chart_data[i], chart_data[i - 1]))
 
     return error_points
+
 
 # API Route `/api/data/stock` - Fetches stock quote and logo
 @app.route('/api/data/stock')
@@ -85,8 +138,17 @@ def fetch_quote():
     quote_prediction = predict_stock_algorithm_1(quote_avg, quote_yesterday_avg)
 
     # Calculate error for 100 data points
-    stock_error_points = fetch_error_points(raw_quote_response['chart'])
-    stock_error_points.insert(0, round((quote_prediction - quote_avg), 2)) # Prepend the latest daily values
+    error_series = fetch_error_points(raw_quote_response['chart'])
+    error_series.insert(0, round((quote_prediction - quote_avg), 2)) # Prepend the array w/ the latest daily values
+    upper_and_lower_limits = get_lower_and_upper_limit(error_series)
+
+    lower_range = quote_prediction - abs(upper_and_lower_limits[0])
+    upper_range = quote_prediction + upper_and_lower_limits[1]
+
+    for i in range(len(error_series)):
+        probability = algo_success(upper_and_lower_limits[0], upper_and_lower_limits[1], error_series[i]);
+
+    verbal_analysis = determine_analysis(lower_range, upper_range, quote_avg)
 
     response = {
         'stock': {
@@ -97,7 +159,12 @@ def fetch_quote():
             'date': raw_quote_response['quote']['latestTime']
         },
         'prediction': {
-            'tomorrow_avg': str(quote_prediction)
+            'tomorrow_avg': str(quote_prediction),
+            'limits': upper_and_lower_limits,
+            'lower_range': round(lower_range, 2),
+            'upper_range': round(upper_range, 2),
+            'probability': probability * 100,
+            'verbal_analysis': verbal_analysis
         }
     }
 

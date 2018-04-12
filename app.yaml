@@ -8,6 +8,10 @@ handlers:
 - url: /.*
   script: main.app
 
+libraries:
+- name: numpy
+  version: "1.6.1"
+
 skip_files:
 # default
 - ^(.*/)?#.*#$

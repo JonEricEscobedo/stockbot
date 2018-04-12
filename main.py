@@ -163,7 +163,7 @@ def fetch_quote():
             'limits': upper_and_lower_limits,
             'lower_range': round(lower_range, 2),
             'upper_range': round(upper_range, 2),
-            'probability': probability * 100,
+            'probability': round(probability * 100, 0),
             'verbal_analysis': verbal_analysis
         }
     }

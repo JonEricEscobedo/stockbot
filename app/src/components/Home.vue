@@ -32,7 +32,7 @@ export default {
       })
         .then(response => {
           this.stockData = response.data.stock
-          this.predictionData = response.data.prediction
+          this.predictionData = response.data.predictions
         })
         .catch(error => {
           console.log('Error fetching stock data', error)

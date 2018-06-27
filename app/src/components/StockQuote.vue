@@ -2,7 +2,7 @@
   <div>
     <p class="lead">{{ stockData.company }}</p>
     <p class="lead">Today's average: ${{ stockData.quote }}</p>
-    <p class="lead">Tomorrow's predicted average: ${{ predictionData.tomorrow_avg }}</p>
+    <p class="lead">Tomorrow's predicted average: ${{ predictionData.prediction1.tomorrow_avg }}</p>
   </div>
 </template>
 

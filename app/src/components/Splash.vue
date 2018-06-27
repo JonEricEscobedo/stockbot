@@ -2,11 +2,8 @@
   <section>
     <div class="container flex-center">
       <div class="row flex-center pt-5 mt-5">
-        <div class="offset-md-1 col-md-4 text-center text-md-left align-self-center">
+        <div class="col align-self-center text-center">
           <Stock :stock-data="stockData" :prediction-data="predictionData"></Stock>
-        </div>
-        <div class="col-md-6">
-          <SplashImage />
         </div>
       </div>
     </div>
@@ -15,10 +12,9 @@
 
 <script>
 import Stock from './Stock.vue'
-import SplashImage from './SplashImage.vue'
 
 export default {
-  components: { Stock, SplashImage },
+  components: { Stock },
   props: ['stock-data', 'prediction-data']
 }
 </script>

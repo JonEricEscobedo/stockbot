@@ -1,8 +1,8 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark ">
       <div class="container">
-        <a class="navbar-brand" href="/"><strong>Stockbot</strong></a>
+        <a class="navbar-brand" id="brand" href="/"><strong>Stockbot</strong></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-7" aria-controls="navbarSupportedContent-7" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -17,7 +17,7 @@
           </ul>
           <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
             <input class="form-control mr-sm-2" type="search" placeholder="Stock ticker" aria-label="Search" @change="onChange">
-            <button class="btn btn-outline-success my-2 my-sm-0" @click="onQuoteClick">Quote</button>
+            <button class="btn btn-outline-danger my-2 my-sm-0" @click="onQuoteClick">Quote</button>
           </form>
         </div>
       </div>
@@ -35,3 +35,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  #brand {
+    color: #C50000
+  }
+</style>

@@ -9,3 +9,4 @@ app/dist
 lib/
 env/
 *.pyc
+yarn-error.log

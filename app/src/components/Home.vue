@@ -2,7 +2,7 @@
   <div>
     <Navbar @update-stock-ticker="updateStockTicker" :on-quote-click="getStockDataFromBackend" />
     <Splash :stock-data="stockData" :prediction-data="predictionData" />
-    <About />
+    <Disclaimer />
   </div>
 </template>
 
@@ -10,10 +10,10 @@
 import axios from 'axios'
 import Navbar from './Navbar.vue'
 import Splash from './Splash.vue'
-import About from './About.vue'
+import Disclaimer from './Disclaimer.vue'
 /* eslint-env jquery */
 export default {
-  components: { Navbar, Splash, About },
+  components: { Navbar, Splash, Disclaimer },
   data () {
     return {
       stockData: null,

@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark ">
       <div class="container">
-        <a class="navbar-brand" id="brand" href="/"><strong>Stockbot</strong></a>
+        <a class="navbar-brand" id="brand" href="/"><strong>Intellivest</strong></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-7" aria-controls="navbarSupportedContent-7" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -12,7 +12,7 @@
               <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#about">About</a>
+              <a class="nav-link" href="#disclaimer">Disclaimer</a>
             </li>
           </ul>
           <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>

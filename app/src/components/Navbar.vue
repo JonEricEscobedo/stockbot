@@ -16,7 +16,7 @@
             </li>
           </ul>
           <form class="form-inline my-2 my-lg-0" v-on:submit.prevent>
-            <input class="form-control mr-sm-2" type="search" placeholder="Stock ticker" aria-label="Search" @change="onChange">
+            <input class="form-control mr-sm-2" type="search" placeholder="Stock ticker" aria-label="Search" @change="onChange" onclick="this.select()">
             <button class="btn btn-outline-danger my-2 my-sm-0" @click="onQuoteClick">Quote</button>
           </form>
         </div>
